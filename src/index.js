@@ -56,11 +56,6 @@ async function handleApi(request, env, url) {
       const body = await request.json();
       return await createDrama(body);
     }
-    if (path.match(/^\/api\/dramas\/[^/]+$/) && method === 'PUT') {
-      const dramaId = path.split('/').pop();
-      const body = await request.json();
-      return await updateDrama(dramaId, body);
-    }
     if (path.match(/^\/api\/dramas\/[^/]+$/) && method === 'DELETE') {
       const dramaId = path.split('/').pop();
       return await deleteDrama(dramaId);
@@ -90,8 +85,6 @@ async function handleApi(request, env, url) {
 
     // 统计
     if (path === '/api/overview' && method === 'GET') return await getOverview();
-    if (path === '/api/recent' && method === 'GET') return await getRecent();
-    if (path === '/api/stats' && method === 'GET') return await getStats();
 
     return jsonResponse({ error: 'Not found' }, 404);
   } catch (err) {
@@ -100,124 +93,68 @@ async function handleApi(request, env, url) {
 }
 
 // ========== 短剧 CRUD ==========
-
 async function createDrama(data) {
+  // 1. 生成短剧ID
   const maxIdResult = await executeSQL('SELECT MAX(CAST(drama_id AS UNSIGNED)) as max_id FROM drama');
   const nextId = (maxIdResult[0].max_id || 0) + 1;
   const dramaId = String(nextId).padStart(5, '0');
   const dramaName = data.dramaName;
   const watchTime = data.watchTime || new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-  await executeSQL("INSERT INTO drama (drama_id, drama_name, watch_time) VALUES ('" + dramaId + "', '" + dramaName.replace(/'/g, "''") + "', '" + watchTime + "')");
-
-  if (data.females && data.females.length > 0) {
-    for (const f of data.females) {
-      let actorId = f.aId;
-      if (!actorId) {
-        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + f.actor.replace(/'/g, "''") + "' AND gender = 'f'");
-        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
-        if (existing.length === 0) {
-          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + f.actor.replace(/'/g, "''") + "', 'f')");
-        }
+  // 2. 处理所有演员，收集ID
+  const allActorIds = [];
+  const allActors = [...(data.females || []), ...(data.males || [])];
+  for (const actor of allActors) {
+    let actorId = actor.aId;
+    if (!actorId) {
+      // 按名字找或新建演员
+      const gender = data.females && data.females.includes(actor) ? 'f' : 'm';
+      const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + actor.actor.replace(/'/g, "''") + "'");
+      if (existing.length > 0) {
+        actorId = existing[0].actor_id;
+      } else {
+        actorId = generateId('a');
+        await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + actor.actor.replace(/'/g, "''") + "', '" + gender + "')");
       }
-      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (f.role || '未标注').replace(/'/g, "''") + "')");
     }
+    allActorIds.push(actorId);
   }
 
-  if (data.males && data.males.length > 0) {
-    for (const m of data.males) {
-      let actorId = m.aId;
-      if (!actorId) {
-        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + m.actor.replace(/'/g, "''") + "' AND gender = 'm'");
-        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
-        if (existing.length === 0) {
-          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + m.actor.replace(/'/g, "''") + "', 'm')");
-        }
-      }
-      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (m.role || '未标注').replace(/'/g, "''") + "')");
+  // 3. 处理所有标签，收集ID
+  const allTagIds = [];
+  for (const tagName of (data.tags || [])) {
+    let tagId;
+    const existing = await executeSQL("SELECT tag_id FROM tag WHERE tag_name = '" + tagName.replace(/'/g, "''") + "'");
+    if (existing.length > 0) {
+      tagId = existing[0].tag_id;
+    } else {
+      tagId = generateId('t');
+      await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
     }
+    allTagIds.push(tagId);
   }
 
-  if (data.tags && data.tags.length > 0) {
-    for (const tagName of data.tags) {
-      let tagId;
-      const existing = await executeSQL("SELECT tag_id FROM tag WHERE tag_name = '" + tagName.replace(/'/g, "''") + "'");
-      tagId = existing.length > 0 ? existing[0].tag_id : generateId('t');
-      if (existing.length === 0) {
-        await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
-      }
-      await executeSQL("INSERT INTO drama_tag (dt_id, drama_id, tag_id) VALUES ('" + generateId('dt') + "', '" + dramaId + "', '" + tagId + "')");
-    }
-  }
+  // 4. 插入drama总表，演员ID和标签ID用逗号分隔存进去
+  await executeSQL(
+    "INSERT INTO drama (drama_id, drama_name, watch_time, actor_ids, tag_ids) VALUES ('" +
+    dramaId + "', '" + dramaName.replace(/'/g, "''") + "', '" + watchTime + "', '" +
+    allActorIds.join(',') + "', '" + allTagIds.join(',') + "')"
+  );
 
   return jsonResponse({ success: true, dramaId });
 }
 
-async function updateDrama(dramaId, data) {
-  // 先删除旧关联
-  await executeSQL("DELETE FROM drama_cast WHERE drama_id = '" + dramaId + "'");
-  await executeSQL("DELETE FROM drama_tag WHERE drama_id = '" + dramaId + "'");
-  
-  // 更新短剧基本信息
-  await executeSQL("UPDATE drama SET drama_name = '" + data.dramaName.replace(/'/g, "''") + "', watch_time = '" + data.watchTime.replace('T', ' ') + "' WHERE drama_id = '" + dramaId + "'");
-  
-  // 重新插入演员关联
-  if (data.females && data.females.length > 0) {
-    for (const f of data.females) {
-      let actorId = f.aId;
-      if (!actorId) {
-        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + f.actor.replace(/'/g, "''") + "' AND gender = 'f'");
-        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
-        if (existing.length === 0) {
-          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + f.actor.replace(/'/g, "''") + "', 'f')");
-        }
-      }
-      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (f.role || '未标注').replace(/'/g, "''") + "')");
-    }
-  }
-  
-  if (data.males && data.males.length > 0) {
-    for (const m of data.males) {
-      let actorId = m.aId;
-      if (!actorId) {
-        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + m.actor.replace(/'/g, "''") + "' AND gender = 'm'");
-        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
-        if (existing.length === 0) {
-          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + m.actor.replace(/'/g, "''") + "', 'm')");
-        }
-      }
-      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (m.role || '未标注').replace(/'/g, "''") + "')");
-    }
-  }
-  
-  // 重新插入标签关联
-  if (data.tags && data.tags.length > 0) {
-    for (const tagName of data.tags) {
-      let tagId;
-      const existing = await executeSQL("SELECT tag_id FROM tag WHERE tag_name = '" + tagName.replace(/'/g, "''") + "'");
-      tagId = existing.length > 0 ? existing[0].tag_id : generateId('t');
-      if (existing.length === 0) {
-        await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
-      }
-      await executeSQL("INSERT INTO drama_tag (dt_id, drama_id, tag_id) VALUES ('" + generateId('dt') + "', '" + dramaId + "', '" + tagId + "')");
-    }
-  }
-  
-  return jsonResponse({ success: true });
-}
-
 async function deleteDrama(dramaId) {
-  await executeSQL("DELETE FROM drama_cast WHERE drama_id = '" + dramaId + "'");
-  await executeSQL("DELETE FROM drama_tag WHERE drama_id = '" + dramaId + "'");
   await executeSQL("DELETE FROM drama WHERE drama_id = '" + dramaId + "'");
   return jsonResponse({ success: true });
 }
 
 // ========== 演员 CRUD ==========
-
 async function createActor(data) {
   const actorId = generateId('a');
-  await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" + actorId + "', '" + data.actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" + (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
+  await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" +
+    actorId + "', '" + data.actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" +
+    (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
   return jsonResponse({ success: true, actorId });
 }
 
@@ -228,123 +165,109 @@ async function updateActor(actorId, data) {
   if (data.actorName !== undefined) updates.push("actor_name = '" + data.actorName.replace(/'/g, "''") + "'");
   
   if (updates.length === 0) return jsonResponse({ error: '没有要更新的字段' }, 400);
-  
   await executeSQL("UPDATE actor SET " + updates.join(', ') + " WHERE actor_id = '" + actorId + "'");
   return jsonResponse({ success: true });
 }
 
 async function deleteActor(actorId) {
-  await executeSQL("DELETE FROM drama_cast WHERE actor_id = '" + actorId + "'");
   await executeSQL("DELETE FROM actor WHERE actor_id = '" + actorId + "'");
   return jsonResponse({ success: true });
 }
 
-// ========== 标签 ==========
-
-async function getTags() {
-  const tags = await executeSQL(`
-    SELECT t.tag_id, t.tag_name, COUNT(dt.drama_id) as drama_count
-    FROM tag t
-    LEFT JOIN drama_tag dt ON t.tag_id = dt.tag_id
-    GROUP BY t.tag_id
-    ORDER BY drama_count DESC, t.tag_name ASC
-  `);
-  return jsonResponse(tags);
-}
-
 // ========== 查询接口 ==========
-
 async function getOverview() {
   const actorCount = await executeSQL('SELECT COUNT(*) as total FROM actor');
   const femaleCount = await executeSQL("SELECT COUNT(*) as total FROM actor WHERE gender = 'f'");
   const maleCount = await executeSQL("SELECT COUNT(*) as total FROM actor WHERE gender = 'm'");
   const dramaCount = await executeSQL('SELECT COUNT(*) as total FROM drama');
   
-  const recentDramas = await executeSQL(`
-    SELECT d.drama_id, d.drama_name, d.watch_time,
-      GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN a.actor_name END) as female_actors,
-      GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN a.actor_name END) as male_actors,
-      GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN dc.role_name END) as female_roles,
-      GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN dc.role_name END) as male_roles
-    FROM drama d
-    LEFT JOIN drama_cast dc ON d.drama_id = dc.drama_id
-    LEFT JOIN actor a ON dc.actor_id = a.actor_id
-    WHERE d.watch_time IS NOT NULL
-    GROUP BY d.drama_id
-    ORDER BY d.watch_time DESC
-    LIMIT 10
-  `);
-
   return jsonResponse({
     actorCount: actorCount[0].total,
     femaleCount: femaleCount[0].total,
     maleCount: maleCount[0].total,
     dramaCount: dramaCount[0].total,
-    recentDramas: recentDramas,
   });
 }
 
 async function getActors(gender) {
-  let query = `
-    SELECT a.actor_id, a.actor_name, a.gender, a.birthday, a.debut_work,
-      COUNT(dc.cast_id) as drama_count
-    FROM actor a
-    LEFT JOIN drama_cast dc ON a.actor_id = dc.actor_id
-  `;
-  
-  if (gender) query += " WHERE a.gender = '" + gender + "'";
-  query += ' GROUP BY a.actor_id ORDER BY drama_count DESC, a.actor_name ASC';
+  // 查所有演员，统计每个演员在多少部剧里出现过
+  const dramas = await executeSQL('SELECT actor_ids FROM drama');
+  const dramaCountMap = {};
+  dramas.forEach(d => {
+    if (!d.actor_ids) return;
+    d.actor_ids.split(',').forEach(actorId => {
+      dramaCountMap[actorId] = (dramaCountMap[actorId] || 0) + 1;
+    });
+  });
+
+  let query = "SELECT * FROM actor WHERE 1=1";
+  if (gender) query += " AND gender = '" + gender + "'";
+  query += " ORDER BY actor_name ASC";
   
   const actors = await executeSQL(query);
-  return jsonResponse(actors);
+  return jsonResponse(actors.map(a => ({
+    ...a,
+    drama_count: dramaCountMap[a.actor_id] || 0
+  })));
 }
 
 async function getDramas() {
-  const dramas = await executeSQL(`
-    SELECT d.drama_id, d.drama_name, d.watch_time, d.remark,
-      GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN CONCAT(a.actor_id, ':', a.actor_name, ':', dc.role_name) END) as females,
-      GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN CONCAT(a.actor_id, ':', a.actor_name, ':', dc.role_name) END) as males,
-      GROUP_CONCAT(t.tag_name) as tags
-    FROM drama d
-    LEFT JOIN drama_cast dc ON d.drama_id = dc.drama_id
-    LEFT JOIN actor a ON dc.actor_id = a.actor_id
-    LEFT JOIN drama_tag dt ON d.drama_id = dt.drama_id
-    LEFT JOIN tag t ON dt.tag_id = t.tag_id
-    GROUP BY d.drama_id
-    ORDER BY d.watch_time DESC, d.drama_name ASC
-  `);
-  return jsonResponse(dramas);
+  // 1. 查所有剧
+  const dramas = await executeSQL('SELECT * FROM drama ORDER BY watch_time DESC, drama_name ASC');
+  // 2. 查所有演员和标签，方便拼名字
+  const allActors = await executeSQL('SELECT actor_id, actor_name, gender FROM actor');
+  const allTags = await executeSQL('SELECT tag_id, tag_name FROM tag');
+  const actorMap = {};
+  allActors.forEach(a => actorMap[a.actor_id] = a);
+  const tagMap = {};
+  allTags.forEach(t => tagMap[t.tag_id] = t);
+
+  // 3. 把剧里的actor_ids和tag_ids转成名字
+  return jsonResponse(dramas.map(d => {
+    const females = [];
+    const males = [];
+    if (d.actor_ids) {
+      d.actor_ids.split(',').forEach(actorId => {
+        const actor = actorMap[actorId];
+        if (actor) {
+          if (actor.gender === 'f') females.push({ aId: actor.actor_id, actor: actor.actor_name, role: '' });
+          else males.push({ aId: actor.actor_id, actor: actor.actor_name, role: '' });
+        }
+      });
+    }
+    const tags = [];
+    if (d.tag_ids) {
+      d.tag_ids.split(',').forEach(tagId => {
+        const tag = tagMap[tagId];
+        if (tag) tags.push(tag.tag_name);
+      });
+    }
+    return {
+      drama_id: d.drama_id,
+      drama_name: d.drama_name,
+      watch_time: d.watch_time,
+      females,
+      males,
+      tags
+    };
+  }));
 }
 
-async function getRecent() {
-  const recent = await executeSQL(`
-    SELECT d.drama_id, d.drama_name, d.watch_time,
-      GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN a.actor_name END) as female_actors,
-      GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN a.actor_name END) as male_actors
-    FROM drama d
-    LEFT JOIN drama_cast dc ON d.drama_id = dc.drama_id
-    LEFT JOIN actor a ON dc.actor_id = a.actor_id
-    WHERE d.watch_time IS NOT NULL
-    GROUP BY d.drama_id
-    ORDER BY d.watch_time DESC
-    LIMIT 20
-  `);
-  return jsonResponse(recent);
-}
+async function getTags() {
+  const dramas = await executeSQL('SELECT tag_ids FROM drama');
+  const tagCountMap = {};
+  dramas.forEach(d => {
+    if (!d.tag_ids) return;
+    d.tag_ids.split(',').forEach(tagId => {
+      tagCountMap[tagId] = (tagCountMap[tagId] || 0) + 1;
+    });
+  });
 
-async function getStats() {
-  const actorDistribution = await executeSQL(`
-    SELECT drama_count, COUNT(*) as actor_num
-    FROM (
-      SELECT a.actor_id, COUNT(dc.cast_id) as drama_count
-      FROM actor a
-      LEFT JOIN drama_cast dc ON a.actor_id = dc.actor_id
-      GROUP BY a.actor_id
-    ) as sub
-    GROUP BY drama_count
-    ORDER BY drama_count
-  `);
-  return jsonResponse({ actorDistribution });
+  const tags = await executeSQL('SELECT * FROM tag ORDER BY tag_name ASC');
+  return jsonResponse(tags.map(t => ({
+    ...t,
+    drama_count: tagCountMap[t.tag_id] || 0
+  })));
 }
 
 function jsonResponse(data, status = 200) {
