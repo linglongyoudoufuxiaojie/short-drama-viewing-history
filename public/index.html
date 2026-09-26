@@ -5802,7 +5802,7 @@ function showActorConfirmModal(females, males, onConfirm) {
 }
 
 // 真正执行添加
-function doSubmitAddDrama(dramaName, females, males) {
+async function doSubmitAddDrama(dramaName, females, males) {
     var submitTime;
     var timeInput = document.getElementById('addSubmitTime').value;
     if (timeInput) { submitTime = new Date(timeInput); }
