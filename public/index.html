@@ -5118,53 +5118,71 @@ saveToStorage(initialTotal);
 renderAll(initialTotal);
 
 // ===== 从 API 加载数据（数据库版） =====
+// ===== 从 API 加载数据（数据库版） =====
+// 规则：API 返回有数据才覆盖本地，空值不覆盖已有数据，防止误清空
 async function loadDataFromAPI() {
     try {
-        // 获取女演员
+        // 1. 同步女演员列表
         const femaleRes = await fetch('/api/actors?gender=f');
         const femaleData = await femaleRes.json();
         if (Array.isArray(femaleData) && femaleData.length > 0) {
-            FEMALE = femaleData.map(a => ({
-                name: a.actor_name,
-                count: a.drama_count,
-                roles: a.roles || [],
-                birthday: a.birthday,
-                aId: a.actor_id
-            }));
+            FEMALE = femaleData.map(function(a) {
+                return {
+                    name: a.actor_name,
+                    count: a.drama_count,
+                    roles: [],
+                    birthday: a.birthday,
+                    debutWork: a.debut_work,
+                    aId: a.actor_id
+                };
+            });
         }
         
-        // 获取男演员
+        // 2. 同步男演员列表
         const maleRes = await fetch('/api/actors?gender=m');
         const maleData = await maleRes.json();
         if (Array.isArray(maleData) && maleData.length > 0) {
-            MALE = maleData.map(a => ({
-                name: a.actor_name,
-                count: a.drama_count,
-                roles: a.roles || [],
-                birthday: a.birthday,
-                aId: a.actor_id
-            }));
+            MALE = maleData.map(function(a) {
+                return {
+                    name: a.actor_name,
+                    count: a.drama_count,
+                    roles: [],
+                    birthday: a.birthday,
+                    debutWork: a.debut_work,
+                    aId: a.actor_id
+                };
+            });
         }
         
-        // 获取最近观看
-        const recentRes = await fetch('/api/recent');
-        const recentData = await recentRes.json();
-        if (Array.isArray(recentData) && recentData.length > 0) {
-            RECENT5 = recentData.map(r => ({
-                drama: r.drama_name,
-                time: r.watch_time ? r.watch_time.substring(5, 16).replace('T', ' ') : '',
-                females: r.females || [],
-                males: r.males || [],
-                tags: r.tags || []
-            }));
+        // 3. 同步所有短剧列表
+        const dramasRes = await fetch('/api/dramas');
+        const dramasData = await dramasRes.json();
+        if (Array.isArray(dramasData) && dramasData.length > 0) {
+            ALL_DRAMAS = dramasData.map(function(d) {
+                return {
+                    drama: d.drama_name,
+                    time: d.watch_time,
+                    females: d.females ? d.females.split(',').map(function(s) {
+                        const parts = s.split(':');
+                        return { aId: parts[0], actor: parts[1], role: parts[2] };
+                    }) : [],
+                    males: d.males ? d.males.split(',').map(function(s) {
+                        const parts = s.split(':');
+                        return { aId: parts[0], actor: parts[1], role: parts[2] };
+                    }) : [],
+                    tags: d.tags ? d.tags.split(',') : []
+                };
+            });
+            RECENT5 = ALL_DRAMAS.slice(0, 20);
         }
         
-        // 重新渲染
+        // 4. 同步完成，渲染页面并存回本地缓存
         migrateToAIds();
         renderAll(ALL_DRAMAS.length);
-        console.log('数据从 API 加载成功');
+        saveToStorage(ALL_DRAMAS.length);
+        console.log('✅ 数据从数据库同步完成');
     } catch (err) {
-        console.log('API 加载失败，使用本地数据:', err);
+        console.log('⚠️ 数据库连接失败，使用本地缓存数据:', err);
     }
 }
 
