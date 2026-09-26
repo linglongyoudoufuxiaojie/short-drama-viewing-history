@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>短剧演员出演统计</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js">document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -20,16 +22,20 @@
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.echarts||document.write('<script src="https://unpkg.com/echarts@5.4.3/dist/echarts.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -41,16 +47,20 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.echarts||document.write('<script src="https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -62,16 +72,20 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -83,16 +97,20 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.XLSX||document.write('<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -104,16 +122,20 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.XLSX||document.write('<script src="https://cdn.staticfile.org/xlsx/0.18.5/xlsx.full.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -125,10 +147,12 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -1180,6 +1204,8 @@ body {
         <h1 style="margin-bottom:0;">🎬 短剧演员出演次数统计</h1>
         <div class="header-right" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <button class="add-btn" onclick="openAddModal()">➕ 添加短剧</button>
+            <button id="startSyncBtn" style="padding:6px 14px;background:rgba(64,158,255,0.15);color:#64b5f6;border:1px solid rgba(64,158,255,0.3);border-radius:6px;cursor:pointer;font-size:12px;">📡 同步到数据库</button>
+            <button id="cancelSyncBtn" disabled style="padding:6px 14px;background:rgba(245,108,108,0.15);color:#f8807c;border:1px solid rgba(245,108,108,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:none;">取消同步</button>
             <div class="header-upload-group">
                 <label class="upload-btn" title="点击选择文件，或直接拖拽Excel文件到页面任意位置">
                     📁 上传Excel <span style="font-size:11px;opacity:0.8;">(可拖拽)</span>
@@ -1575,10 +1601,12 @@ body {
 <div id="pdfReportSource" class="pdf-report-source"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js">document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -1590,16 +1618,20 @@ body {
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.jspdf||document.write('<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -1611,16 +1643,20 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 <script>window.jspdf||document.write('<script src="https://cdn.staticfile.org/jspdf/2.5.1/jspdf.umd.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -1632,10 +1668,12 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 
 <script>
@@ -6157,10 +6195,12 @@ document.getElementById('confirmOverlay').addEventListener('click', function(e) 
 });
 
 document.getElementById('startSyncBtn').onclick = async function() {
-    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    if (syncDramasList.length === 0) { showToast('本地没有可同步的数据！','error'); return; }
     isSyncCancel = false;
     let s=0,f=0; const total=syncDramasList.length;
-    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    this.disabled=true; this.style.opacity='0.5';
+    document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('cancelSyncBtn').style.display='inline-block';
     document.getElementById('syncErrorList').innerHTML='';
     for(let i=0;i<total;i++){
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
@@ -6172,15 +6212,18 @@ document.getElementById('startSyncBtn').onclick = async function() {
         }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').style.display='block'; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
         await new Promise(r=>setTimeout(r,200));
     }
-    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    this.disabled=false; this.style.opacity='1';
+    document.getElementById('cancelSyncBtn').disabled=true;
+    document.getElementById('cancelSyncBtn').style.display='none';
     if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
 };
-document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; this.style.opacity='0.5'; };
 </script>
 
 
 </body>
 </html>
+
 
 
 
