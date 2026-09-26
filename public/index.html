@@ -1213,14 +1213,19 @@ body {
             </div>
         </div>
     </div>
-    <!-- 数据库同步面板 -->
-    <div style="max-width:1200px;margin:12px auto;padding:16px;border:1px solid #333;border-radius:10px;background:#1a1a2e;">
-      <h4 style="margin:0 0 10px 0;color:#fff;">📡 数据库批量同步</h4>
-      <div style="margin:6px 0;color:#ccc;">进度：<span id="syncProgress" style="font-weight:bold;color:#fff;">0 / 0</span></div>
-      <div style="margin:6px 0;color:#ccc;">✅ 成功：<span id="syncSuccess" style="color:#4caf50;font-weight:bold;">0</span> &nbsp;&nbsp; ❌ 失败：<span id="syncFail" style="color:#f44336;font-weight:bold;">0</span></div>
-      <div id="syncErrorList" style="max-height:100px;overflow:auto;color:#f44336;font-size:12px;margin:8px 0;padding:6px;background:#0f0f1a;border-radius:4px;"></div>
-      <button id="startSyncBtn" style="padding:8px 16px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-right:8px;">开始同步到数据库</button>
-      <button id="cancelSyncBtn" disabled style="padding:8px 16px;background:#f56c6c;color:#fff;border:none;border-radius:4px;cursor:pointer;">取消同步</button>
+    <!-- 数据库同步状态条（铺满全宽，左右布局） -->
+    <div style="width:100%;padding:8px 24px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(26,26,46,0.4);display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;color:#888;">
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="color:#c9c9d9;">📊 短剧批量同步</span>
+        <span>进度：<span id="syncProgress" style="color:#e0e0e0;font-weight:500;">0/0</span></span>
+        <span>✅ 成功：<span id="syncSuccess" style="color:#66bb6a;font-weight:500;">0</span></span>
+        <span>❌ 失败：<span id="syncFail" style="color:#ef5350;font-weight:500;">0</span></span>
+        <div id="syncErrorList" style="max-height:40px;overflow:auto;color:#ef5350;font-size:11px;display:none;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="startSyncBtn" style="padding:5px 12px;background:rgba(64,158,255,0.15);color:#64b5f6;border:1px solid rgba(64,158,255,0.3);border-radius:6px;cursor:pointer;font-size:12px;">开始同步</button>
+        <button id="cancelSyncBtn" disabled style="padding:5px 12px;background:rgba(245,108,108,0.15);color:#f8807c;border:1px solid rgba(245,108,108,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:none;">取消</button>
+      </div>
     </div>
     <div class="tabs">
         <div class="tab active" data-tab="overview">📊 总览</div>
@@ -6221,6 +6226,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
 </body>
 </html>
+
 
 
 
