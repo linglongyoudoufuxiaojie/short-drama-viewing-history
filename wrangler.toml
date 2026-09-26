@@ -11,4 +11,4 @@ not_found_handling = "single-page-application"
 # Hyperdrive 数据库配置（SQLPub）
 [[hyperdrive]]
 binding = "HYPERDRIVE"
-id = "wxwl-wanlv-db"
+id = "15f4b03f63964fbc9089cba4e140beba"
