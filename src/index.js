@@ -167,12 +167,21 @@ async function deleteDrama(dramaId) {
 }
 
 async function createActor(data) {
-  const prefix = data.gender === 'f' ? 'A' : 'B';
-  const actorId = generateId(prefix);
-  await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" +
-    actorId + "', '" + data.actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" +
-    (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
-  return jsonResponse({ success: true, actorId });
+  const actorName = data.actorName.trim();
+  // 重名校验：同名同性别演员已存在就更新信息，不重复插入
+  const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + actorName.replace(/'/g, "''") + "' AND gender = '" + data.gender + "' LIMIT 1");
+  if (existing.length > 0) {
+    const actorId = existing[0].actor_id;
+    await executeSQL("UPDATE actor SET birthday = '" + (data.birthday || '').replace(/'/g, "''") + "', debut_work = '" + (data.debutWork || '').replace(/'/g, "''") + "' WHERE actor_id = '" + actorId + "'");
+    return jsonResponse({ success: true, actorId, updated: true });
+  } else {
+    const prefix = data.gender === 'f' ? 'A' : 'B';
+    const actorId = generateId(prefix);
+    await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" +
+      actorId + "', '" + actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" +
+      (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
+    return jsonResponse({ success: true, actorId, created: true });
+  }
 }
 
 async function updateActor(actorId, data) {
@@ -269,3 +278,4 @@ function jsonResponse(data, status = 200) {
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
   });
 }
+

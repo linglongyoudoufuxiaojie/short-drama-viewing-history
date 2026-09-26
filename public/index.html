@@ -15,7 +15,10 @@
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -25,7 +28,7 @@
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -65,7 +68,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -75,7 +81,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -115,7 +121,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -125,7 +134,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -165,7 +174,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -175,7 +187,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -215,7 +227,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -225,7 +240,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -265,7 +280,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -275,7 +293,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -1770,7 +1788,10 @@ body {
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -1780,7 +1801,7 @@ body {
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -1820,7 +1841,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -1830,7 +1854,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -1870,7 +1894,10 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -1880,7 +1907,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -6439,7 +6466,10 @@ document.getElementById('startSyncBtn').onclick = async function() {
 
     // 第一步：先同步所有演员数据
     showToast('第一步：同步演员数据...');
-    const allActors = [...FEMALE, ...MALE];
+    // 女演员显式标记gender=f
+    const femaleActors = FEMALE.map(a => ({...a, gender:'f'}));
+    const maleActors = MALE.map(a => ({...a, gender:'m'}));
+    const allActors = [...femaleActors, ...maleActors];
     const actorTotal = allActors.length;
     for(let i=0;i<actorTotal;i++){
         if(isSyncCancel){ break; }
@@ -6449,7 +6479,7 @@ document.getElementById('startSyncBtn').onclick = async function() {
         document.getElementById('syncPercent').innerText='('+percent+'%)';
         document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
-            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday,debutWork:a.debutWork})});
+            await fetch('/api/actors',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actorName:a.name,gender:a.gender,birthday:a.birthday||'',debutWork:a.debutWork||''})});
             s++;
         }catch(e){ f++; }
         await new Promise(r=>setTimeout(r,150));
@@ -6482,6 +6512,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
 </body>
 </html>
+
 
 
 
