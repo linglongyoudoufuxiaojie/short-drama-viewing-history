@@ -5813,13 +5813,44 @@ function doSubmitAddDrama(dramaName, females, males) {
     var totalEl = document.querySelector('#tab-overview .ov-card .num');
     var totalDramas;
     if (editTargetIdx === null) {
-        // 新增
+        // 新增 - 先调用 API 写入数据库
+        try {
+            const res = await fetch('/api/dramas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dramaName: dramaName,
+                    watchTime: submitTime.toISOString().slice(0, 19).replace('T', ' '),
+                    females: females,
+                    males: males,
+                    tags: tags
+                })
+            });
+            if (!res.ok) throw new Error('API 错误');
+            showToast('添加成功！已写入数据库');
+        } catch (e) {
+            showToast('添加失败：' + e.message, 'error');
+            return;
+        }
+        // 然后更新本地界面
         addDramaToData(dramaName, females, males, submitTime, tags);
         totalDramas = parseInt(totalEl.textContent) + 1;
         renderAll(totalDramas);
+        closeAddModal();
+    } else {
+        // 修改
+        var finalTime;
+        if (timeInput) {
+            finalTime = toLocalISO(new Date(timeInput));
+        } else {
+            finalTime = ALL_DRAMAS[editTargetIdx] ? ALL_DRAMAS[editTargetIdx].time : toLocalISO(new Date());
+        }
+        updateDramaInData(editTargetIdx, dramaName, females, males, finalTime, tags);
+        totalDramas = parseInt(totalEl.textContent);
+        renderAll(totalDramas);
         saveToStorage(totalDramas);
         closeAddModal();
-        showToast('添加成功！已更新统计数据');
+        showToast('修改成功！已更新统计数据');
     } else {
         // 修改
         var finalTime;
