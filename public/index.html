@@ -5022,6 +5022,30 @@ function handleFileUpload(file) {
         ALL_DRAMAS = result.allDramas || ALL_DRAMAS;
         renderAll(result.totalDramas);
         saveToStorage(result.totalDramas);
+                // ===== 批量同步所有短剧到数据库，自动写全所有表 =====
+        (async () => {
+            showToast('正在把 ' + result.allDramas.length + ' 部剧批量写入数据库...');
+            let successCount = 0;
+            for (const drama of result.allDramas) {
+                try {
+                    await fetch('/api/dramas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            dramaName: drama.drama,
+                            watchTime: drama.time,
+                            females: drama.females || [],
+                            males: drama.males || [],
+                            tags: drama.tags || []
+                        })
+                    });
+                    successCount++;
+                } catch (e) {
+                    console.warn('写入短剧失败:', drama.drama, e);
+                }
+            }
+            showToast('✅ 批量导入完成：成功写入 ' + successCount + ' 部剧到数据库，所有表已同步！');
+        })();
         const tagNote = keptTags > 0 ? '，标签列留空已保留 ' + keptTags + ' 部已有标签' : '';
         showToast(`更新成功！${result.totalDramas}部剧，${FEMALE.length}女${MALE.length}男${tagNote}`, 'success');
     }
