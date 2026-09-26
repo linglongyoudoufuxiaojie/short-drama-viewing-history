@@ -1,4 +1,4 @@
-﻿// SQLPub API 配置
+// SQLPub API 配置
 const SQLPUB_API_URL = 'https://client.sqlpub.com/api/database/execute';
 const SQLPUB_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ind4d2xfdXNlciIsImV4cCI6MTc5MDQ5MTY1NX0.4EWFhSRedSqnFQtbJIpGl3TwMMadXww6iJ40N1ww2RY';
 
@@ -7,7 +7,6 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // CORS 处理
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
@@ -18,17 +17,14 @@ export default {
       });
     }
 
-    // API 路由
     if (path.startsWith('/api/')) {
       return handleApi(request, env, url);
     }
 
-    // 其他请求交给静态资源处理
     return env.ASSETS.fetch(request);
   },
 };
 
-// 执行 SQL 的 helper 函数
 async function executeSQL(sql) {
   const res = await fetch(SQLPUB_API_URL, {
     method: 'POST',
@@ -45,7 +41,6 @@ async function executeSQL(sql) {
   return data.data || [];
 }
 
-// 生成唯一 ID
 function generateId(prefix) {
   return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
 }
@@ -55,39 +50,48 @@ async function handleApi(request, env, url) {
   const method = request.method;
 
   try {
-    // 短剧相关
-    if (path === '/api/dramas' && method === 'GET') {
-      return await getDramas();
-    }
+    // 短剧 CRUD
+    if (path === '/api/dramas' && method === 'GET') return await getDramas();
     if (path === '/api/dramas' && method === 'POST') {
       const body = await request.json();
       return await createDrama(body);
+    }
+    if (path.match(/^\/api\/dramas\/[^/]+$/) && method === 'PUT') {
+      const dramaId = path.split('/').pop();
+      const body = await request.json();
+      return await updateDrama(dramaId, body);
     }
     if (path.match(/^\/api\/dramas\/[^/]+$/) && method === 'DELETE') {
       const dramaId = path.split('/').pop();
       return await deleteDrama(dramaId);
     }
 
-    // 演员相关
+    // 演员 CRUD
     if (path === '/api/actors' && method === 'GET') {
       const gender = url.searchParams.get('gender');
       return await getActors(gender);
+    }
+    if (path === '/api/actors' && method === 'POST') {
+      const body = await request.json();
+      return await createActor(body);
+    }
+    if (path.match(/^\/api\/actors\/[^/]+$/) && method === 'PUT') {
+      const actorId = path.split('/').pop();
+      const body = await request.json();
+      return await updateActor(actorId, body);
     }
     if (path.match(/^\/api\/actors\/[^/]+$/) && method === 'DELETE') {
       const actorId = path.split('/').pop();
       return await deleteActor(actorId);
     }
 
-    // 统计相关
-    if (path === '/api/overview' && method === 'GET') {
-      return await getOverview();
-    }
-    if (path === '/api/recent' && method === 'GET') {
-      return await getRecent();
-    }
-    if (path === '/api/stats' && method === 'GET') {
-      return await getStats();
-    }
+    // 标签
+    if (path === '/api/tags' && method === 'GET') return await getTags();
+
+    // 统计
+    if (path === '/api/overview' && method === 'GET') return await getOverview();
+    if (path === '/api/recent' && method === 'GET') return await getRecent();
+    if (path === '/api/stats' && method === 'GET') return await getStats();
 
     return jsonResponse({ error: 'Not found' }, 404);
   } catch (err) {
@@ -98,26 +102,21 @@ async function handleApi(request, env, url) {
 // ========== 短剧 CRUD ==========
 
 async function createDrama(data) {
-  // drama_id 是 varchar(5)，用短数字 ID
   const maxIdResult = await executeSQL('SELECT MAX(CAST(drama_id AS UNSIGNED)) as max_id FROM drama');
   const nextId = (maxIdResult[0].max_id || 0) + 1;
   const dramaId = String(nextId).padStart(5, '0');
   const dramaName = data.dramaName;
   const watchTime = data.watchTime || new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-  // 1. 插入短剧
   await executeSQL("INSERT INTO drama (drama_id, drama_name, watch_time) VALUES ('" + dramaId + "', '" + dramaName.replace(/'/g, "''") + "', '" + watchTime + "')");
 
-  // 2. 处理女演员
   if (data.females && data.females.length > 0) {
     for (const f of data.females) {
       let actorId = f.aId;
       if (!actorId) {
         const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + f.actor.replace(/'/g, "''") + "' AND gender = 'f'");
-        if (existing.length > 0) {
-          actorId = existing[0].actor_id;
-        } else {
-          actorId = generateId('a');
+        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
+        if (existing.length === 0) {
           await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + f.actor.replace(/'/g, "''") + "', 'f')");
         }
       }
@@ -125,16 +124,13 @@ async function createDrama(data) {
     }
   }
 
-  // 3. 处理男演员
   if (data.males && data.males.length > 0) {
     for (const m of data.males) {
       let actorId = m.aId;
       if (!actorId) {
         const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + m.actor.replace(/'/g, "''") + "' AND gender = 'm'");
-        if (existing.length > 0) {
-          actorId = existing[0].actor_id;
-        } else {
-          actorId = generateId('a');
+        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
+        if (existing.length === 0) {
           await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + m.actor.replace(/'/g, "''") + "', 'm')");
         }
       }
@@ -142,15 +138,12 @@ async function createDrama(data) {
     }
   }
 
-  // 4. 处理标签
   if (data.tags && data.tags.length > 0) {
     for (const tagName of data.tags) {
       let tagId;
       const existing = await executeSQL("SELECT tag_id FROM tag WHERE tag_name = '" + tagName.replace(/'/g, "''") + "'");
-      if (existing.length > 0) {
-        tagId = existing[0].tag_id;
-      } else {
-        tagId = generateId('t');
+      tagId = existing.length > 0 ? existing[0].tag_id : generateId('t');
+      if (existing.length === 0) {
         await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
       }
       await executeSQL("INSERT INTO drama_tag (dt_id, drama_id, tag_id) VALUES ('" + generateId('dt') + "', '" + dramaId + "', '" + tagId + "')");
@@ -158,6 +151,59 @@ async function createDrama(data) {
   }
 
   return jsonResponse({ success: true, dramaId });
+}
+
+async function updateDrama(dramaId, data) {
+  // 先删除旧关联
+  await executeSQL("DELETE FROM drama_cast WHERE drama_id = '" + dramaId + "'");
+  await executeSQL("DELETE FROM drama_tag WHERE drama_id = '" + dramaId + "'");
+  
+  // 更新短剧基本信息
+  await executeSQL("UPDATE drama SET drama_name = '" + data.dramaName.replace(/'/g, "''") + "', watch_time = '" + data.watchTime.replace('T', ' ') + "' WHERE drama_id = '" + dramaId + "'");
+  
+  // 重新插入演员关联
+  if (data.females && data.females.length > 0) {
+    for (const f of data.females) {
+      let actorId = f.aId;
+      if (!actorId) {
+        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + f.actor.replace(/'/g, "''") + "' AND gender = 'f'");
+        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
+        if (existing.length === 0) {
+          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + f.actor.replace(/'/g, "''") + "', 'f')");
+        }
+      }
+      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (f.role || '未标注').replace(/'/g, "''") + "')");
+    }
+  }
+  
+  if (data.males && data.males.length > 0) {
+    for (const m of data.males) {
+      let actorId = m.aId;
+      if (!actorId) {
+        const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + m.actor.replace(/'/g, "''") + "' AND gender = 'm'");
+        actorId = existing.length > 0 ? existing[0].actor_id : generateId('a');
+        if (existing.length === 0) {
+          await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + m.actor.replace(/'/g, "''") + "', 'm')");
+        }
+      }
+      await executeSQL("INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES ('" + generateId('c') + "', '" + dramaId + "', '" + actorId + "', '" + (m.role || '未标注').replace(/'/g, "''") + "')");
+    }
+  }
+  
+  // 重新插入标签关联
+  if (data.tags && data.tags.length > 0) {
+    for (const tagName of data.tags) {
+      let tagId;
+      const existing = await executeSQL("SELECT tag_id FROM tag WHERE tag_name = '" + tagName.replace(/'/g, "''") + "'");
+      tagId = existing.length > 0 ? existing[0].tag_id : generateId('t');
+      if (existing.length === 0) {
+        await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
+      }
+      await executeSQL("INSERT INTO drama_tag (dt_id, drama_id, tag_id) VALUES ('" + generateId('dt') + "', '" + dramaId + "', '" + tagId + "')");
+    }
+  }
+  
+  return jsonResponse({ success: true });
 }
 
 async function deleteDrama(dramaId) {
@@ -169,10 +215,41 @@ async function deleteDrama(dramaId) {
 
 // ========== 演员 CRUD ==========
 
+async function createActor(data) {
+  const actorId = generateId('a');
+  await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" + actorId + "', '" + data.actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" + (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
+  return jsonResponse({ success: true, actorId });
+}
+
+async function updateActor(actorId, data) {
+  const updates = [];
+  if (data.birthday !== undefined) updates.push("birthday = '" + data.birthday.replace(/'/g, "''") + "'");
+  if (data.debutWork !== undefined) updates.push("debut_work = '" + data.debutWork.replace(/'/g, "''") + "'");
+  if (data.actorName !== undefined) updates.push("actor_name = '" + data.actorName.replace(/'/g, "''") + "'");
+  
+  if (updates.length === 0) return jsonResponse({ error: '没有要更新的字段' }, 400);
+  
+  await executeSQL("UPDATE actor SET " + updates.join(', ') + " WHERE actor_id = '" + actorId + "'");
+  return jsonResponse({ success: true });
+}
+
 async function deleteActor(actorId) {
   await executeSQL("DELETE FROM drama_cast WHERE actor_id = '" + actorId + "'");
   await executeSQL("DELETE FROM actor WHERE actor_id = '" + actorId + "'");
   return jsonResponse({ success: true });
+}
+
+// ========== 标签 ==========
+
+async function getTags() {
+  const tags = await executeSQL(`
+    SELECT t.tag_id, t.tag_name, COUNT(dt.drama_id) as drama_count
+    FROM tag t
+    LEFT JOIN drama_tag dt ON t.tag_id = dt.tag_id
+    GROUP BY t.tag_id
+    ORDER BY drama_count DESC, t.tag_name ASC
+  `);
+  return jsonResponse(tags);
 }
 
 // ========== 查询接口 ==========
@@ -215,10 +292,7 @@ async function getActors(gender) {
     LEFT JOIN drama_cast dc ON a.actor_id = dc.actor_id
   `;
   
-  if (gender) {
-    query += " WHERE a.gender = '" + gender + "'";
-  }
-  
+  if (gender) query += " WHERE a.gender = '" + gender + "'";
   query += ' GROUP BY a.actor_id ORDER BY drama_count DESC, a.actor_name ASC';
   
   const actors = await executeSQL(query);
@@ -239,7 +313,6 @@ async function getDramas() {
     GROUP BY d.drama_id
     ORDER BY d.watch_time DESC, d.drama_name ASC
   `);
-  
   return jsonResponse(dramas);
 }
 
@@ -256,7 +329,6 @@ async function getRecent() {
     ORDER BY d.watch_time DESC
     LIMIT 20
   `);
-  
   return jsonResponse(recent);
 }
 
@@ -272,7 +344,6 @@ async function getStats() {
     GROUP BY drama_count
     ORDER BY drama_count
   `);
-
   return jsonResponse({ actorDistribution });
 }
 
