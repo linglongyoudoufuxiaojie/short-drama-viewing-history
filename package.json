@@ -1,0 +1,16 @@
+{
+  "name": "short-drama-viewing-history",
+  "version": "1.0.0",
+  "description": "短剧演员出演统计 - Cloudflare Worker 全栈应用",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "mysql2": "^3.6.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
