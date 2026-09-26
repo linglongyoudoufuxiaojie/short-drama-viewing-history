@@ -1766,7 +1766,22 @@ function showAddSameNameConfirm(name, gender, birthday, debutWork, sameNameActor
 }
 
 // 真正执行添加演员
-function doAddActor(name, gender, birthday, debutWork) {
+async function doAddActor(name, gender, birthday, debutWork) {
+        // 调用 API 添加演员到数据库
+    try {
+        await fetch('/api/actors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                actorName: name,
+                gender: gender,
+                birthday: birthday,
+                debutWork: debutWork
+            })
+        });
+    } catch (e) {
+        console.warn('添加演员到数据库失败:', e);
+    }
     const pool = gender === 'f' ? FEMALE : MALE;
     // 生成新的 aId
     const newAId = genAId(gender);
