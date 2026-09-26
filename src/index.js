@@ -41,8 +41,10 @@ async function executeSQL(sql) {
   return data.data || [];
 }
 
+// 生成7位16进制ID：前缀 + 6位随机16进制
 function generateId(prefix) {
-  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+  const hex = Math.random().toString(16).substring(2, 8).toUpperCase();
+  return prefix + hex;
 }
 
 async function handleApi(request, env, url) {
@@ -103,18 +105,30 @@ async function createDrama(data) {
 
   // 2. 处理所有演员，收集ID
   const allActorIds = [];
-  const allActors = [...(data.females || []), ...(data.males || [])];
-  for (const actor of allActors) {
-    let actorId = actor.aId;
+  // 女演员
+  for (const f of (data.females || [])) {
+    let actorId = f.aId;
     if (!actorId) {
-      // 按名字找或新建演员
-      const gender = data.females && data.females.includes(actor) ? 'f' : 'm';
-      const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + actor.actor.replace(/'/g, "''") + "'");
+      const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + f.actor.replace(/'/g, "''") + "'");
       if (existing.length > 0) {
         actorId = existing[0].actor_id;
       } else {
-        actorId = generateId('a');
-        await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + actor.actor.replace(/'/g, "''") + "', '" + gender + "')");
+        actorId = generateId('A'); // 女演员A开头
+        await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + f.actor.replace(/'/g, "''") + "', 'f')");
+      }
+    }
+    allActorIds.push(actorId);
+  }
+  // 男演员
+  for (const m of (data.males || [])) {
+    let actorId = m.aId;
+    if (!actorId) {
+      const existing = await executeSQL("SELECT actor_id FROM actor WHERE actor_name = '" + m.actor.replace(/'/g, "''") + "'");
+      if (existing.length > 0) {
+        actorId = existing[0].actor_id;
+      } else {
+        actorId = generateId('B'); // 男演员B开头
+        await executeSQL("INSERT INTO actor (actor_id, actor_name, gender) VALUES ('" + actorId + "', '" + m.actor.replace(/'/g, "''") + "', 'm')");
       }
     }
     allActorIds.push(actorId);
@@ -128,7 +142,7 @@ async function createDrama(data) {
     if (existing.length > 0) {
       tagId = existing[0].tag_id;
     } else {
-      tagId = generateId('t');
+      tagId = generateId('T'); // 标签T开头
       await executeSQL("INSERT INTO tag (tag_id, tag_name) VALUES ('" + tagId + "', '" + tagName.replace(/'/g, "''") + "')");
     }
     allTagIds.push(tagId);
@@ -151,7 +165,9 @@ async function deleteDrama(dramaId) {
 
 // ========== 演员 CRUD ==========
 async function createActor(data) {
-  const actorId = generateId('a');
+  // 根据性别生成ID：女A开头，男B开头
+  const prefix = data.gender === 'f' ? 'A' : 'B';
+  const actorId = generateId(prefix);
   await executeSQL("INSERT INTO actor (actor_id, actor_name, gender, birthday, debut_work) VALUES ('" +
     actorId + "', '" + data.actorName.replace(/'/g, "''") + "', '" + data.gender + "', '" +
     (data.birthday || '') + "', '" + (data.debutWork || '') + "')");
