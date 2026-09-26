@@ -98,7 +98,10 @@ async function handleApi(request, env, url) {
 // ========== 短剧 CRUD ==========
 
 async function createDrama(data) {
-  const dramaId = generateId('d');
+  // drama_id 是 varchar(5)，用短数字 ID
+  const maxIdResult = await executeSQL('SELECT MAX(CAST(drama_id AS UNSIGNED)) as max_id FROM drama');
+  const nextId = (maxIdResult[0].max_id || 0) + 1;
+  const dramaId = String(nextId).padStart(5, '0');
   const dramaName = data.dramaName;
   const watchTime = data.watchTime || new Date().toISOString().slice(0, 19).replace('T', ' ');
 
