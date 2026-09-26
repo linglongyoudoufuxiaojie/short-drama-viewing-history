@@ -1672,7 +1672,7 @@ function closeActorModal() {
 }
 
 // 提交演员表单（添加或编辑）
-function submitActorForm() {
+async function submitActorForm() {
     const name = document.getElementById('actorNameInput').value.trim();
     const gender = document.getElementById('actorGenderSelect').value;
     const birthday = document.getElementById('actorBirthdayInput').value.trim();
@@ -1690,6 +1690,20 @@ function submitActorForm() {
         editingActor.name = name;
         editingActor.birthday = birthday;
         editingActor.debutWork = debutWork;
+                // 同步更新到数据库
+        try {
+            await fetch('/api/actors/' + editingActor.aId, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    actorName: name,
+                    birthday: birthday,
+                    debutWork: debutWork
+                })
+            });
+        } catch (e) {
+            console.warn('更新演员信息到数据库失败:', e);
+        }
         showToast('演员信息已更新');
         closeActorModal();
         // 保存到本地
@@ -1828,7 +1842,16 @@ function showActorDeleteConfirm(actor, gender, tipText) {
 }
 
 // 仅删除演员（保留作品，作品里没有演员了就删作品）
-function doDeleteActorOnly(actor, gender) {
+async function doDeleteActorOnly(actor, gender) {
+        // 先删除数据库里的演员
+    try {
+        await fetch('/api/actors/' + actor.aId, {
+            method: 'DELETE'
+        });
+    } catch (e) {
+        showToast('删除演员失败：' + e.message, 'error');
+        return;
+    }
     const pool = gender === 'f' ? FEMALE : MALE;
     
     // 1. 从演员池里删除
@@ -1883,7 +1906,16 @@ function doDeleteActorOnly(actor, gender) {
 }
 
 // 删除演员+所有相关作品
-function doDeleteActorWithWorks(actor, gender) {
+async function doDeleteActorWithWorks(actor, gender) {
+        // 先删除数据库里的演员
+    try {
+        await fetch('/api/actors/' + actor.aId, {
+            method: 'DELETE'
+        });
+    } catch (e) {
+        showToast('删除演员失败：' + e.message, 'error');
+        return;
+    }
     const pool = gender === 'f' ? FEMALE : MALE;
     
     // 1. 从演员池里删除
