@@ -5807,13 +5807,11 @@ async function doSubmitAddDrama(dramaName, females, males) {
     var timeInput = document.getElementById('addSubmitTime').value;
     if (timeInput) { submitTime = new Date(timeInput); }
     else { submitTime = new Date(); }
-    // 收集标签（最多5个，来自 chip 列表）
     if (document.getElementById('addTagInput') && document.getElementById('addTagInput').value.trim()) addTagChip();
     var tags = pendingTags.slice();
     var totalEl = document.querySelector('#tab-overview .ov-card .num');
     var totalDramas;
     if (editTargetIdx === null) {
-        // 新增 - 先调用 API 写入数据库
         try {
             const res = await fetch('/api/dramas', {
                 method: 'POST',
@@ -5832,27 +5830,11 @@ async function doSubmitAddDrama(dramaName, females, males) {
             showToast('添加失败：' + e.message, 'error');
             return;
         }
-        // 然后更新本地界面
         addDramaToData(dramaName, females, males, submitTime, tags);
         totalDramas = parseInt(totalEl.textContent) + 1;
         renderAll(totalDramas);
         closeAddModal();
     } else {
-        // 修改
-        var finalTime;
-        if (timeInput) {
-            finalTime = toLocalISO(new Date(timeInput));
-        } else {
-            finalTime = ALL_DRAMAS[editTargetIdx] ? ALL_DRAMAS[editTargetIdx].time : toLocalISO(new Date());
-        }
-        updateDramaInData(editTargetIdx, dramaName, females, males, finalTime, tags);
-        totalDramas = parseInt(totalEl.textContent);
-        renderAll(totalDramas);
-        saveToStorage(totalDramas);
-        closeAddModal();
-        showToast('修改成功！已更新统计数据');
-    } else {
-        // 修改
         var finalTime;
         if (timeInput) {
             finalTime = toLocalISO(new Date(timeInput));
