@@ -3344,7 +3344,7 @@ function importActors(input, gender) {
     if (!file) return;
     
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const data = new Uint8Array(e.target.result);
             const wb = XLSX.read(data, { type: 'array' });
@@ -3404,7 +3404,39 @@ function importActors(input, gender) {
             // 保存到本地并更新页面
             saveToStorage(ALL_DRAMAS.length);
             renderAll(ALL_DRAMAS.length);
-            
+             // ===== 批量同步导入的演员到数据库 =====
+            showToast('正在同步 ' + (added + updated) + ' 位演员到数据库...');
+            for (let i = 0; i < pool.length; i++) {
+                const a = pool[i];
+                try {
+                    if (existingIdx >= 0) {
+                        // 更新已有演员
+                        await fetch('/api/actors/' + a.aId, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                actorName: a.name,
+                                birthday: a.birthday,
+                                debutWork: a.debutWork
+                            })
+                        });
+                    } else {
+                        // 新增演员
+                        await fetch('/api/actors', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                actorName: a.name,
+                                gender: gender,
+                                birthday: a.birthday,
+                                debutWork: a.debutWork
+                            })
+                        });
+                    }
+                } catch (e) {
+                    console.warn('同步演员失败:', a.name, e);
+                }
+            }
             showToast('导入完成：新增 ' + added + ' 位，更新 ' + updated + ' 位', 'success');
         } catch(err) {
             showToast('导入失败：' + err.message, 'error');
