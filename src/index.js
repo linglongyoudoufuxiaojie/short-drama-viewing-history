@@ -100,7 +100,7 @@ async function createDrama(env, data) {
     const watchTime = data.watchTime || new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     // 1. 插入短剧
-    await conn.execute(
+    await conn.query(
       'INSERT INTO drama (drama_id, drama_name, watch_time) VALUES (?, ?, ?)',
       [dramaId, dramaName, watchTime]
     );
@@ -111,7 +111,7 @@ async function createDrama(env, data) {
         let actorId = f.aId;
         // 如果没有 aId，按名字查找或新建
         if (!actorId) {
-          const [existing] = await conn.execute(
+          const [existing] = await conn.query(
             "SELECT actor_id FROM actor WHERE actor_name = ? AND gender = 'f'",
             [f.actor]
           );
@@ -119,14 +119,14 @@ async function createDrama(env, data) {
             actorId = existing[0].actor_id;
           } else {
             actorId = generateId('a');
-            await conn.execute(
+            await conn.query(
               "INSERT INTO actor (actor_id, actor_name, gender) VALUES (?, ?, 'f')",
               [actorId, f.actor]
             );
           }
         }
         // 插入演员表
-        await conn.execute(
+        await conn.query(
           'INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES (?, ?, ?, ?)',
           [generateId('c'), dramaId, actorId, f.role || '未标注']
         );
@@ -138,7 +138,7 @@ async function createDrama(env, data) {
       for (const m of data.males) {
         let actorId = m.aId;
         if (!actorId) {
-          const [existing] = await conn.execute(
+          const [existing] = await conn.query(
             "SELECT actor_id FROM actor WHERE actor_name = ? AND gender = 'm'",
             [m.actor]
           );
@@ -146,13 +146,13 @@ async function createDrama(env, data) {
             actorId = existing[0].actor_id;
           } else {
             actorId = generateId('a');
-            await conn.execute(
+            await conn.query(
               "INSERT INTO actor (actor_id, actor_name, gender) VALUES (?, ?, 'm')",
               [actorId, m.actor]
             );
           }
         }
-        await conn.execute(
+        await conn.query(
           'INSERT INTO drama_cast (cast_id, drama_id, actor_id, role_name) VALUES (?, ?, ?, ?)',
           [generateId('c'), dramaId, actorId, m.role || '未标注']
         );
@@ -163,7 +163,7 @@ async function createDrama(env, data) {
     if (data.tags && data.tags.length > 0) {
       for (const tagName of data.tags) {
         let tagId;
-        const [existing] = await conn.execute(
+        const [existing] = await conn.query(
           'SELECT tag_id FROM tag WHERE tag_name = ?',
           [tagName]
         );
@@ -171,12 +171,12 @@ async function createDrama(env, data) {
           tagId = existing[0].tag_id;
         } else {
           tagId = generateId('t');
-          await conn.execute(
+          await conn.query(
             'INSERT INTO tag (tag_id, tag_name) VALUES (?, ?)',
             [tagId, tagName]
           );
         }
-        await conn.execute(
+        await conn.query(
           'INSERT INTO drama_tag (dt_id, drama_id, tag_id) VALUES (?, ?, ?)',
           [generateId('dt'), dramaId, tagId]
         );
@@ -200,11 +200,11 @@ async function deleteDrama(env, dramaId) {
     await conn.beginTransaction();
     
     // 删除演员表
-    await conn.execute('DELETE FROM drama_cast WHERE drama_id = ?', [dramaId]);
+    await conn.query('DELETE FROM drama_cast WHERE drama_id = ?', [dramaId]);
     // 删除标签关联
-    await conn.execute('DELETE FROM drama_tag WHERE drama_id = ?', [dramaId]);
+    await conn.query('DELETE FROM drama_tag WHERE drama_id = ?', [dramaId]);
     // 删除短剧
-    await conn.execute('DELETE FROM drama WHERE drama_id = ?', [dramaId]);
+    await conn.query('DELETE FROM drama WHERE drama_id = ?', [dramaId]);
     
     await conn.commit();
     return jsonResponse({ success: true });
@@ -243,7 +243,7 @@ async function updateActor(env, actorId, data) {
   }
   
   params.push(actorId);
-  await conn.execute(
+  await conn.query(
     `UPDATE actor SET ${updates.join(', ')} WHERE actor_id = ?`,
     params
   );
@@ -259,9 +259,9 @@ async function deleteActor(env, actorId) {
     await conn.beginTransaction();
     
     // 删除演员表关联
-    await conn.execute('DELETE FROM drama_cast WHERE actor_id = ?', [actorId]);
+    await conn.query('DELETE FROM drama_cast WHERE actor_id = ?', [actorId]);
     // 删除演员
-    await conn.execute('DELETE FROM actor WHERE actor_id = ?', [actorId]);
+    await conn.query('DELETE FROM actor WHERE actor_id = ?', [actorId]);
     
     await conn.commit();
     return jsonResponse({ success: true });
@@ -278,12 +278,12 @@ async function deleteActor(env, actorId) {
 async function getOverview(env) {
   const conn = await getDbConnection(env);
   
-  const [actorCount] = await conn.execute('SELECT COUNT(*) as total FROM actor');
-  const [femaleCount] = await conn.execute("SELECT COUNT(*) as total FROM actor WHERE gender = 'f'");
-  const [maleCount] = await conn.execute("SELECT COUNT(*) as total FROM actor WHERE gender = 'm'");
-  const [dramaCount] = await conn.execute('SELECT COUNT(*) as total FROM drama');
+  const [actorCount] = await conn.query('SELECT COUNT(*) as total FROM actor');
+  const [femaleCount] = await conn.query("SELECT COUNT(*) as total FROM actor WHERE gender = 'f'");
+  const [maleCount] = await conn.query("SELECT COUNT(*) as total FROM actor WHERE gender = 'm'");
+  const [dramaCount] = await conn.query('SELECT COUNT(*) as total FROM drama');
   
-  const [recentDramas] = await conn.execute(`
+  const [recentDramas] = await conn.query(`
     SELECT d.drama_id, d.drama_name, d.watch_time,
       GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN a.actor_name END) as female_actors,
       GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN a.actor_name END) as male_actors,
@@ -329,7 +329,7 @@ async function getActors(env, gender) {
   
   query += ' GROUP BY a.actor_id ORDER BY drama_count DESC, a.actor_name ASC';
   
-  const [actors] = await conn.execute(query, params);
+  const [actors] = await conn.query(query, params);
   
   const result = actors.map(a => ({
     ...a,
@@ -343,7 +343,7 @@ async function getActors(env, gender) {
 async function getDramas(env) {
   const conn = await getDbConnection(env);
   
-  const [dramas] = await conn.execute(`
+  const [dramas] = await conn.query(`
     SELECT d.drama_id, d.drama_name, d.watch_time, d.remark,
       GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN JSON_OBJECT('actor_id', a.actor_id, 'actor', a.actor_name, 'role', dc.role_name) END) as females,
       GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN JSON_OBJECT('actor_id', a.actor_id, 'actor', a.actor_name, 'role', dc.role_name) END) as males,
@@ -371,7 +371,7 @@ async function getDramas(env) {
 async function getRecent(env) {
   const conn = await getDbConnection(env);
   
-  const [recent] = await conn.execute(`
+  const [recent] = await conn.query(`
     SELECT d.drama_id, d.drama_name, d.watch_time,
       GROUP_CONCAT(CASE WHEN a.gender = 'f' THEN JSON_OBJECT('actor_id', a.actor_id, 'actor', a.actor_name, 'role', dc.role_name) END) as females,
       GROUP_CONCAT(CASE WHEN a.gender = 'm' THEN JSON_OBJECT('actor_id', a.actor_id, 'actor', a.actor_name, 'role', dc.role_name) END) as males
@@ -397,7 +397,7 @@ async function getRecent(env) {
 async function getStats(env) {
   const conn = await getDbConnection(env);
   
-  const [actorDistribution] = await conn.execute(`
+  const [actorDistribution] = await conn.query(`
     SELECT drama_count, COUNT(*) as actor_num
     FROM (
       SELECT a.actor_id, COUNT(dc.cast_id) as drama_count
