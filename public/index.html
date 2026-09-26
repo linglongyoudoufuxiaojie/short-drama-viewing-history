@@ -16,7 +16,9 @@
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -42,7 +44,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -68,7 +72,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -94,7 +100,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -120,7 +128,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -146,7 +156,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -1232,6 +1244,10 @@ body {
         <button id="startSyncBtn" style="padding:5px 12px;background:rgba(64,158,255,0.15);color:#64b5f6;border:1px solid rgba(64,158,255,0.3);border-radius:6px;cursor:pointer;font-size:12px;">开始同步</button>
         <button id="cancelSyncBtn" disabled style="padding:5px 12px;background:rgba(245,108,108,0.15);color:#f8807c;border:1px solid rgba(245,108,108,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:none;">取消</button>
       </div>
+      <!-- 紫色渐变进度条 -->
+      <div style="width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+        <div id="syncProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#a855f7,#ec4899);transition:width 0.2s;"></div>
+      </div>
     </div>
     <div class="tabs">
         <div class="tab active" data-tab="overview">📊 总览</div>
@@ -1621,7 +1637,9 @@ body {
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -1647,7 +1665,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -1673,7 +1693,9 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -6218,7 +6240,9 @@ document.getElementById('startSyncBtn').onclick = async function() {
         if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
         const d=syncDramasList[i];
         document.getElementById('syncProgress').innerText=(i+1)+'/'+total;
-            document.getElementById('syncPercent').innerText='('+Math.round(((i+1)/total)*100)+'%)';
+            const percent = Math.round(((i+1)/total)*100);
+            document.getElementById('syncPercent').innerText='('+percent+'%)';
+            document.getElementById('syncProgressBar').style.width = percent + '%';
         try{
             await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
             s++; document.getElementById('syncSuccess').innerText=s;
@@ -6236,6 +6260,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
 </body>
 </html>
+
 
 
 
