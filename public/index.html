@@ -1204,8 +1204,8 @@ body {
         <h1 style="margin-bottom:0;">🎬 短剧演员出演次数统计</h1>
         <div class="header-right" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <button class="add-btn" onclick="openAddModal()">➕ 添加短剧</button>
-            <button id="startSyncBtn" style="padding:6px 14px;background:rgba(64,158,255,0.15);color:#64b5f6;border:1px solid rgba(64,158,255,0.3);border-radius:6px;cursor:pointer;font-size:12px;">📡 同步到数据库</button>
-            <button id="cancelSyncBtn" disabled style="padding:6px 14px;background:rgba(245,108,108,0.15);color:#f8807c;border:1px solid rgba(245,108,108,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:none;">取消同步</button>
+            <button id="startSyncBtn" style="padding:6px 14px;background:rgba(64,158,255,0.15);color:#64b5f6;border:1px solid rgba(64,158,255,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;height:36px;line-height:1;">📡 同步到数据库</button>
+            <button id="cancelSyncBtn" disabled style="padding:6px 14px;background:rgba(245,108,108,0.15);color:#f8807c;border:1px solid rgba(245,108,108,0.3);border-radius:6px;cursor:pointer;font-size:12px;display:none;align-items:center;height:36px;line-height:1;">取消同步</button>
             <div class="header-upload-group">
                 <label class="upload-btn" title="点击选择文件，或直接拖拽Excel文件到页面任意位置">
                     📁 上传Excel <span style="font-size:11px;opacity:0.8;">(可拖拽)</span>
@@ -6223,6 +6223,7 @@ document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; 
 
 </body>
 </html>
+
 
 
 
