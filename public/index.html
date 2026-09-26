@@ -4,12 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>短剧演员出演统计</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script>window.echarts||document.write('<script src="https://unpkg.com/echarts@5.4.3/dist/echarts.min.js"><\/script>')</script>
-<script>window.echarts||document.write('<script src="https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"><\/script>')</script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>window.XLSX||document.write('<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
-<script>window.XLSX||document.write('<script src="https://cdn.staticfile.org/xlsx/0.18.5/xlsx.full.min.js"><\/script>')</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js">document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.echarts||document.write('<script src="https://unpkg.com/echarts@5.4.3/dist/echarts.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.echarts||document.write('<script src="https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.XLSX||document.write('<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.XLSX||document.write('<script src="https://cdn.staticfile.org/xlsx/0.18.5/xlsx.full.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 /* Via/移动端点击兼容：轻量浏览器仅对 cursor:pointer 的元素生成 click，这里覆盖全部可点击元素及其内部子元素，并消除触摸点击延迟 */
@@ -1069,6 +1189,15 @@ body {
             </div>
         </div>
     </div>
+    <!-- 数据库同步面板 -->
+    <div style="max-width:1200px;margin:12px auto;padding:16px;border:1px solid #333;border-radius:10px;background:#1a1a2e;">
+      <h4 style="margin:0 0 10px 0;color:#fff;">📡 数据库批量同步</h4>
+      <div style="margin:6px 0;color:#ccc;">进度：<span id="syncProgress" style="font-weight:bold;color:#fff;">0 / 0</span></div>
+      <div style="margin:6px 0;color:#ccc;">✅ 成功：<span id="syncSuccess" style="color:#4caf50;font-weight:bold;">0</span> &nbsp;&nbsp; ❌ 失败：<span id="syncFail" style="color:#f44336;font-weight:bold;">0</span></div>
+      <div id="syncErrorList" style="max-height:100px;overflow:auto;color:#f44336;font-size:12px;margin:8px 0;padding:6px;background:#0f0f1a;border-radius:4px;"></div>
+      <button id="startSyncBtn" style="padding:8px 16px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-right:8px;">开始同步到数据库</button>
+      <button id="cancelSyncBtn" disabled style="padding:8px 16px;background:#f56c6c;color:#fff;border:none;border-radius:4px;cursor:pointer;">取消同步</button>
+    </div>
     <div class="tabs">
         <div class="tab active" data-tab="overview">📊 总览</div>
         <div class="tab" data-tab="works">📚 作品总览</div>
@@ -1445,9 +1574,69 @@ body {
 <!-- PDF 报告渲染源（Canvas 绘制取内容，不显示给用户） -->
 <div id="pdfReportSource" class="pdf-report-source"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script>window.jspdf||document.write('<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"><\/script>')</script>
-<script>window.jspdf||document.write('<script src="https://cdn.staticfile.org/jspdf/2.5.1/jspdf.umd.min.js"><\/script>')</script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js">document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.jspdf||document.write('<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
+<script>window.jspdf||document.write('<script src="https://cdn.staticfile.org/jspdf/2.5.1/jspdf.umd.min.js"><\/script>')document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
+</script>
 
 <script>
 // ========== 演员AId体系（身份证号，唯一且持久化） ==========
@@ -4961,6 +5150,8 @@ function loadFromStorage() {
 }
 
 // 处理Excel文件上传
+let syncDramasList = [];
+let isSyncCancel = false;
 function handleFileUpload(file) {
     if (!file) return;
     window.clearTimeout(window.__uploadWarnTimer);
@@ -5022,30 +5213,12 @@ function handleFileUpload(file) {
         ALL_DRAMAS = result.allDramas || ALL_DRAMAS;
         renderAll(result.totalDramas);
         saveToStorage(result.totalDramas);
-                // ===== 批量同步所有短剧到数据库，自动写全所有表 =====
-        (async () => {
-            showToast('正在把 ' + result.allDramas.length + ' 部剧批量写入数据库...');
-            let successCount = 0;
-            for (const drama of result.allDramas) {
-                try {
-                    await fetch('/api/dramas', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            dramaName: drama.drama,
-                            watchTime: drama.time,
-                            females: drama.females || [],
-                            males: drama.males || [],
-                            tags: drama.tags || []
-                        })
-                    });
-                    successCount++;
-                } catch (e) {
-                    console.warn('写入短剧失败:', drama.drama, e);
-                }
-            }
-            showToast('✅ 批量导入完成：成功写入 ' + successCount + ' 部剧到数据库，所有表已同步！');
-        })();
+        syncDramasList = result.allDramas;
+document.getElementById('syncProgress').innerText = '0 / ' + syncDramasList.length;
+document.getElementById('syncSuccess').innerText = '0';
+document.getElementById('syncFail').innerText = '0';
+document.getElementById('syncErrorList').innerText = '';
+showToast('Excel解析完成！共' + syncDramasList.length + '部剧，点【开始同步到数据库】写入');
         const tagNote = keptTags > 0 ? '，标签列留空已保留 ' + keptTags + ' 部已有标签' : '';
         showToast(`更新成功！${result.totalDramas}部剧，${FEMALE.length}女${MALE.length}男${tagNote}`, 'success');
     }
@@ -5976,11 +6149,33 @@ document.getElementById('confirmOverlay').addEventListener('click', function(e) 
     if (e.target.id === 'confirmOverlay') closeConfirmModal();
 });
 
+document.getElementById('startSyncBtn').onclick = async function() {
+    if (syncDramasList.length === 0) { showToast('请先上传Excel！','error'); return; }
+    isSyncCancel = false;
+    let s=0,f=0; const total=syncDramasList.length;
+    this.disabled=true; document.getElementById('cancelSyncBtn').disabled=false;
+    document.getElementById('syncErrorList').innerHTML='';
+    for(let i=0;i<total;i++){
+        if(isSyncCancel){ showToast('已取消！成功'+s+'部'); break; }
+        const d=syncDramasList[i];
+        document.getElementById('syncProgress').innerText=(i+1)+' / '+total;
+        try{
+            await fetch('/api/dramas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dramaName:d.drama,watchTime:d.time,females:d.females||[],males:d.males||[],tags:d.tags||[]})});
+            s++; document.getElementById('syncSuccess').innerText=s;
+        }catch(e){ f++; document.getElementById('syncFail').innerText=f; document.getElementById('syncErrorList').innerHTML+='<div>❌ '+d.drama+'</div>'; }
+        await new Promise(r=>setTimeout(r,200));
+    }
+    this.disabled=false; document.getElementById('cancelSyncBtn').disabled=true;
+    if(!isSyncCancel){ showToast('同步完成！成功'+s+'部，失败'+f+'部'); setTimeout(()=>location.reload(),1500); }
+};
+document.getElementById('cancelSyncBtn').onclick=function(){ isSyncCancel=true; this.disabled=true; };
 </script>
 
 
 </body>
 </html>
+
+
 
 
 
