@@ -12,3 +12,8 @@ not_found_handling = "single-page-application"
 [[hyperdrive]]
 binding = "HYPERDRIVE"
 id = "15f4b03f63964fbc9089cba4e140beba"
+
+# 自定义域名配置
+[[routes]]
+pattern = "drama.wanxuwaanyan.dpdns.org/*"
+custom_domain = true
