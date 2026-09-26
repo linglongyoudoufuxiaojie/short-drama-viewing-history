@@ -1,4 +1,4 @@
-import { connect } from 'mysql2';
+﻿import { connect } from 'mysql2';
 
 export default {
   async fetch(request, env) {
