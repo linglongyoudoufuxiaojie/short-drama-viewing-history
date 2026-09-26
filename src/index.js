@@ -1,4 +1,4 @@
-﻿import { connect } from 'mysql2';
+﻿import { createConnection } from 'mysql2/promise';
 
 export default {
   async fetch(request, env) {
@@ -78,7 +78,7 @@ async function handleApi(request, env, url) {
 
 async function getDbConnection(env) {
   const hyperdrive = env.HYPERDRIVE;
-  const conn = await connect(hyperdrive.connectionString);
+  const conn = await createConnection(hyperdrive.connectionString);
   return conn;
 }
 
